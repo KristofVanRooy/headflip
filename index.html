@@ -483,19 +483,23 @@
                 this.tileCount = this.canvas.width / this.gridSize;
                 this.tileCountY = this.canvas.height / this.gridSize;
                 
-                this.headX = 10;
-                this.headY = 10;
+                // Random starting position
+                this.headX = Math.floor(Math.random() * this.tileCount);
+                this.headY = Math.floor(Math.random() * this.tileCountY);
                 this.trail = [];
                 this.tail = 5;
                 
-                this.appleX = 15;
-                this.appleY = 15;
+                // Random apple position (not on snake)
+                do {
+                    this.appleX = Math.floor(Math.random() * this.tileCount);
+                    this.appleY = Math.floor(Math.random() * this.tileCountY);
+                } while (this.appleX === this.headX && this.appleY === this.headY);
                 
                 this.velocityX = 0;
                 this.velocityY = 0;
                 
                 this.isControlled = false;
-                this.autoDirection = 0; // 0=right, 1=down, 2=left, 3=up
+                this.autoDirection = Math.floor(Math.random() * 4); // Random start direction
                 this.directionChangeTimer = 0;
             }
             
@@ -529,11 +533,36 @@
                 if (this.headY < 0) this.headY = this.tileCountY - 1;
                 if (this.headY >= this.tileCountY) this.headY = 0;
                 
-                // Check apple collision
+                // Check apple collision and make it disappear
                 if (this.headX === this.appleX && this.headY === this.appleY) {
-                    this.tail++;
-                    this.appleX = Math.floor(Math.random() * this.tileCount);
-                    this.appleY = Math.floor(Math.random() * this.tileCountY);
+                    this.tail++; // Grow snake
+                    // Spawn new apple at random location
+                    do {
+                        this.appleX = Math.floor(Math.random() * this.tileCount);
+                        this.appleY = Math.floor(Math.random() * this.tileCountY);
+                    } while (this.trail.some(segment => segment.x === this.appleX && segment.y === this.appleY));
+                }
+                
+                // Check self collision for auto-play (reset if hits itself)
+                for (let i = 0; i < this.trail.length - 1; i++) {
+                    if (this.trail[i].x === this.headX && this.trail[i].y === this.headY) {
+                        // Reset snake if it hits itself during auto-play
+                        if (!this.isControlled) {
+                            this.headX = Math.floor(Math.random() * this.tileCount);
+                            this.headY = Math.floor(Math.random() * this.tileCountY);
+                            this.trail = [];
+                            this.tail = 5;
+                            // Change direction after reset
+                            this.autoDirection = Math.floor(Math.random() * 4);
+                            switch(this.autoDirection) {
+                                case 0: this.velocityX = 1; this.velocityY = 0; break;
+                                case 1: this.velocityX = 0; this.velocityY = 1; break;
+                                case 2: this.velocityX = -1; this.velocityY = 0; break;
+                                case 3: this.velocityX = 0; this.velocityY = -1; break;
+                            }
+                        }
+                        break;
+                    }
                 }
                 
                 this.trail.push({x: this.headX, y: this.headY});
@@ -648,14 +677,23 @@
             }
         });
         
-        // Start snake games
-        snakeGames.forEach(snake => {
-            snake.velocityX = 1; // Start moving right
+        // Start snake games with random directions and positions for maximum chaos
+        snakeGames.forEach((snake, index) => {
+            const directions = [
+                {x: 1, y: 0},   // right
+                {x: 0, y: 1},   // down  
+                {x: -1, y: 0},  // left
+                {x: 0, y: -1}   // up
+            ];
+            const randomDir = directions[Math.floor(Math.random() * 4)];
+            snake.velocityX = randomDir.x;
+            snake.velocityY = randomDir.y;
         });
         
+        // Faster update rate for more active auto-play
         setInterval(() => {
             snakeGames.forEach(snake => snake.update());
-        }, 150);
+        }, 120);
         
         // MAXIMUM CHAOS DISTRACTIONS! 🔥
         

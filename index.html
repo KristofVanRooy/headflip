@@ -19,6 +19,7 @@
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
+            color: white; /* Make all text white by default */
         }
         
         @keyframes gradient {
@@ -380,14 +381,22 @@
         
         async function startCamera() {
             try {
+                speak("Yo! I need camera access to work my magic!");
+                
                 const video = document.getElementById('cameraVideo');
                 const cameraContainer = document.getElementById('cameraContainer');
                 const previewArea = document.getElementById('previewArea');
                 
-                // Get camera permission and start video
-                cameraStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'user' } 
-                });
+                // Request camera with more explicit settings
+                const constraints = {
+                    video: {
+                        facingMode: 'user',
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    }
+                };
+                
+                cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
                 
                 video.srcObject = cameraStream;
                 cameraContainer.style.display = 'block';
@@ -399,9 +408,20 @@
                 setTimeout(() => startCountdown(), 2000);
                 
             } catch (error) {
-                console.error('Camera access denied:', error);
-                speak("Bruh, I need camera access to work!");
-                alert('Camera access is required! Please allow camera permissions and try again.');
+                console.error('Camera access error:', error);
+                speak("Bruh, I need camera access to work! Check your browser settings!");
+                
+                // More helpful error message
+                let errorMessage = "Camera access required! ";
+                if (error.name === 'NotAllowedError') {
+                    errorMessage += "Please click the camera icon in your browser's address bar and allow camera access, then try again.";
+                } else if (error.name === 'NotFoundError') {
+                    errorMessage += "No camera found on your device.";
+                } else {
+                    errorMessage += "Please check your browser settings and try again.";
+                }
+                
+                alert(errorMessage);
             }
         }
         
@@ -475,16 +495,16 @@
             countdown.style.display = 'none';
         }
         
-        // Animal results with funny descriptions
+        // Animal results with funny descriptions using YOUR custom images!
         const results = [
             {
                 animal: "pig",
-                image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop&crop=face",
+                image: "https://raw.githubusercontent.com/KristofVanRooy/headflip/main/pig.jpg",
                 text: "BRO YOU'RE LITERALLY A PIG! 🐷 This AI said you got that snout energy! No cap, your cranium screams oink oink! 💀"
             },
             {
                 animal: "donkey", 
-                image: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=400&h=400&fit=crop&crop=face",
+                image: "https://raw.githubusercontent.com/KristofVanRooy/headflip/main/donkey.jpg",
                 text: "YOOO YOU'RE A DONKEY FR! 🫏 The AI said your head shape = stubborn energy! That's actually kinda fire though ngl 🔥"
             },
             {

@@ -135,19 +135,48 @@
         }
         
         .face-reveal {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
+            width: 250px;
+            height: 250px;
+            border-radius: 20px;
             object-fit: cover;
             margin: 20px auto;
             border: 5px solid rgba(255, 255, 255, 0.3);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: block;
         }
         
         .accuracy {
             font-size: 1.2em;
             margin: 15px 0;
             color: #feca57;
+        }
+        
+        .prediction-message {
+            font-size: 1.1em;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #feca57;
+        }
+        
+        .fun-fact {
+            font-size: 0.9em;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-style: italic;
+            opacity: 0.9;
+        }
+        
+        .animal-type {
+            font-size: 1.3em;
+            color: #ff6b6b;
+            margin: 10px 0;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 2px;
         }
         
         .disclaimer {
@@ -190,10 +219,16 @@
         </div>
         
         <div class="result" id="result">
-            <h3>Prediction Complete!</h3>
+            <h3>🎉 Prediction Complete! 🎉</h3>
+            <div class="animal-type" id="animalType">DONKEY</div>
             <img class="face-reveal" id="predictedFace" alt="Predicted face">
             <div class="accuracy" id="accuracyText">Accuracy: 99.7%</div>
-            <p>Based on advanced cranial topology analysis and neural hair pattern recognition.</p>
+            <div class="prediction-message" id="predictionMessage">
+                Congratulations! You have the noble spirit of a wise donkey! 🐴
+            </div>
+            <div class="fun-fact" id="funFact">
+                Did you know donkeys are more cautious than horses?
+            </div>
             <button class="btn" onclick="resetApp()">Try Another Head</button>
         </div>
         
@@ -203,13 +238,45 @@
     </div>
 
     <script>
-        // Animal face URLs (using placeholder images)
-        const animalFaces = [
-            'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9Ijk1IiBmaWxsPSIjOEI0NTEzIiBzdHJva2U9IiM2NTQzMjEiIHN0cm9rZS13aWR0aD0iMyIvPgogIDwhLS0gRG9ua2V5IGZhY2UgLS0+CiAgPCEtLSBFeWVzIC0tPgogIDxjaXJjbGUgY3g9IjcwIiBjeT0iODAiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgogIDxjaXJjbGUgY3g9IjEzMCIgY3k9IjgwIiByPSIxNSIgZmlsbD0id2hpdGUiLz4KICA8Y2lyY2xlIGN4PSI3MCIgY3k9IjgwIiByPSI4IiBmaWxsPSJibGFjayIvPgogIDxjaXJjbGUgY3g9IjEzMCIgY3k9IjgwIiByPSI4IiBmaWxsPSJibGFjayIvPgogIDwhLS0gTm9zZSAtLT4KICA8ZWxsaXBzZSBjeD0iMTAwIiBjeT0iMTEwIiByeD0iMjAiIHJ5PSIzMCIgZmlsbD0iIzY1NDMyMSIvPgogIDxlbGxpcHNlIGN4PSI5NSIgY3k9IjEwNSIgcng9IjQiIHJ5PSI4IiBmaWxsPSJibGFjayIvPgogIDxlbGxpcHNlIGN4PSIxMDUiIGN5PSIxMDUiIHJ4PSI0IiByeT0iOCIgZmlsbD0iYmxhY2siLz4KICA8IS0tIE1vdXRoIC0tPgogIDxwYXRoIGQ9Ik04MCA1MCBRIDEwMCAxNzAgMTIwIDUwIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiLz4KICA8IS0tIEVhcnMgLS0+CiAgPGVsbGlwc2UgY3g9IjUwIiBjeT0iNjAiIHJ4PSIyNSIgcnk9IjQwIiBmaWxsPSIjOEI0NTEzIiBzdHJva2U9IiM2NTQzMjEiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxlbGxpcHNlIGN4PSIxNTAiIGN5PSI2MCIgcng9IjI1IiByeT0iNDAiIGZpbGw9IiM4QjQ1MTMiIHN0cm9rZT0iIzY1NDMyMSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMTAwIiB5PSIxODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iYmxhY2siPkRPTktFWTwvdGV4dD4KPC9zdmc+',
-            
-            'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9Ijk1IiBmaWxsPSIjNzM0QTJFIiBzdHJva2U9IiM0MjI5MTgiIHN0cm9rZS13aWR0aD0iMyIvPgogIDwhLS0gQXBlIGZhY2UgLS0+CiAgPCEtLSBFeWVzIC0tPgogIDxjaXJjbGUgY3g9IjcwIiBjeT0iNzUiIHI9IjE4IiBmaWxsPSJ3aGl0ZSIvPgogIDxjaXJjbGUgY3g9IjEzMCIgY3k9Ijc1IiByPSIxOCIgZmlsbD0id2hpdGUiLz4KICA8Y2lyY2xlIGN4PSI3MCIgY3k9Ijc1IiByPSIxMCIgZmlsbD0iYmxhY2siLz4KICA8Y2lyY2xlIGN4PSIxMzAiIGN5PSI3NSIgcj0iMTAiIGZpbGw9ImJsYWNrIi8+CiAgPCEtLSBOb3NlIC0tPgogIDxlbGxpcHNlIGN4PSIxMDAiIGN5PSIxMTAiIHJ4PSIxNSIgcnk9IjIwIiBmaWxsPSIjNDIyOTE4Ii8+CiAgPGVsbGlwc2UgY3g9Ijk1IiBjeT0iMTA4IiByeD0iMyIgcnk9IjYiIGZpbGw9ImJsYWNrIi8+CiAgPGVsbGlwc2UgY3g9IjEwNSIgY3k9IjEwOCIgcng9IjMiIHJ5PSI2IiBmaWxsPSJibGFjayIvPgogIDwhLS0gTW91dGggLS0+CiAgPGVsbGlwc2UgY3g9IjEwMCIgY3k9IjE0NSIgcng9IjMwIiByeT0iMTUiIGZpbGw9IiMyMjE0MTAiLz4KICA8IS0tIEJyb3cgLS0+CiAgPHBhdGggZD0iTTUwIDUwIFEgNzAgNDAgOTAgNTAiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPgogIDxwYXRoIGQ9Ik0xMTAgNTAgUSAxMzAgNDAgMTUwIDUwIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjQiIGZpbGw9Im5vbmUiLz4KICA8dGV4dCB4PSIxMDAiIHk9IjE4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSJibGFjayI+QVBFPC90ZXh0Pgo8L3N2Zz4=',
-            
-            'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9Ijk1IiBmaWxsPSIjQzY4QzUzIiBzdHJva2U9IiM4RjYxM0MiIHN0cm9rZS13aWR0aD0iMyIvPgogIDwhLS0gTW9ua2V5IGZhY2UgLS0+CiAgPCEtLSBFeWVzIC0tPgogIDxjaXJjbGUgY3g9IjcwIiBjeT0iODAiIHI9IjE2IiBmaWxsPSJ3aGl0ZSIvPgogIDxjaXJjbGUgY3g9IjEzMCIgY3k9IjgwIiByPSIxNiIgZmlsbD0id2hpdGUiLz4KICA8Y2lyY2xlIGN4PSI3MCIgY3k9IjgwIiByPSI5IiBmaWxsPSJibGFjayIvPgogIDxjaXJjbGUgY3g9IjEzMCIgY3k9IjgwIiByPSI5IiBmaWxsPSJibGFjayIvPgogIDwhLS0gTm9zZSAtLT4KICA8ZWxsaXBzZSBjeD0iMTAwIiBjeT0iMTA1IiByeD0iOCIgcnk9IjEyIiBmaWxsPSIjOEY2MTNDIi8+CiAgPGVsbGlwc2UgY3g9Ijk3IiBjeT0iMTAyIiByeD0iMiIgcnk9IjQiIGZpbGw9ImJsYWNrIi8+CiAgPGVsbGlwc2UgY3g9IjEwMyIgY3k9IjEwMiIgcng9IjIiIHJ5PSI0IiBmaWxsPSJibGFjayIvPgogIDwhLS0gTW91dGggLS0+CiAgPGVsbGlwc2UgY3g9IjEwMCIgY3k9IjEzNSIgcng9IjI1IiByeT0iMTIiIGZpbGw9IiM2QjQyMjYiLz4KICA8IS0tIEVhcnMgLS0+CiAgPGNpcmNsZSBjeD0iNDAiIGN5PSI3MCIgcj0iMjAiIGZpbGw9IiNDNjhDNTMiIHN0cm9rZT0iIzhGNjEzQyIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPGNpcmNsZSBjeD0iMTYwIiBjeT0iNzAiIHI9IjIwIiBmaWxsPSIjQzY4QzUzIiBzdHJva2U9IiM4RjYxM0MiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjEwMCIgeT0iMTgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9ImJsYWNrIj5NT05LRVk8L3RleHQ+Cjwvc3ZnPg=='
+        // Real animal images and personalized messages
+        // Using your custom pig and donkey images from GitHub!
+        const animalPredictions = [
+            {
+                type: "donkey",
+                image: "https://raw.githubusercontent.com/KristofVanRooy/headflip/main/donkey.jpg",
+                messages: [
+                    "Congratulations! You have the noble spirit of a wise donkey! 🐴",
+                    "Analysis complete: You possess the stubborn determination of a donkey! 💪",
+                    "Remarkable! Your cranial structure suggests peak donkey intelligence! 🧠",
+                    "Fascinating! You share DNA patterns with the most distinguished donkeys! 🎩",
+                    "Your head shape indicates you're destined for great donkey adventures! 🌟"
+                ],
+                funFacts: [
+                    "Did you know donkeys are more cautious than horses?",
+                    "Donkeys can live up to 40 years - that's some serious wisdom!",
+                    "Your donkey ancestors were probably excellent at carrying things!",
+                    "Donkeys have an incredible memory - just like you probably do!",
+                    "You're in good company - donkeys are incredibly loyal friends!"
+                ]
+            },
+            {
+                type: "pig", 
+                image: "https://raw.githubusercontent.com/KristofVanRooy/headflip/main/pig.jpg",
+                messages: [
+                    "Amazing! You have the brilliant mind of a highly intelligent pig! 🐷",
+                    "Our AI detected premium pig-level intellect in your skull shape! 🧠",
+                    "Congratulations! You possess the charming personality of a pig! ✨",
+                    "Incredible! Your head suggests you're as smart as the smartest pigs! 🎓",
+                    "Analysis shows you have the adventurous spirit of a happy pig! 🌈"
+                ],
+                funFacts: [
+                    "Pigs are actually cleaner than most other animals!",
+                    "Your pig intelligence means you're probably great at problem-solving!",
+                    "Pigs are more intelligent than dogs - that's pretty impressive!",
+                    "You share traits with animals that love rolling in luxury!",
+                    "Pigs are incredibly social - you're probably a great friend!"
+                ]
+            }
         ];
         
         const techPhrases = [
@@ -321,20 +388,50 @@
                 loading.style.display = 'none';
                 result.style.display = 'block';
                 
-                // Pick random animal face
-                const randomFace = animalFaces[Math.floor(Math.random() * animalFaces.length)];
-                predictedFace.src = randomFace;
+                // Pick random animal prediction
+                const randomPrediction = animalPredictions[Math.floor(Math.random() * animalPredictions.length)];
+                const randomMessage = randomPrediction.messages[Math.floor(Math.random() * randomPrediction.messages.length)];
+                const randomFact = randomPrediction.funFacts[Math.floor(Math.random() * randomPrediction.funFacts.length)];
+                
+                // Set the image and content
+                predictedFace.src = randomPrediction.image;
+                document.getElementById('animalType').textContent = randomPrediction.type.toUpperCase();
+                document.getElementById('predictionMessage').textContent = randomMessage;
+                document.getElementById('funFact').textContent = randomFact;
                 
                 // Random "accuracy"
-                const accuracy = (95 + Math.random() * 4.9).toFixed(1);
+                const accuracy = (96 + Math.random() * 3.9).toFixed(1);
                 accuracyText.textContent = `Accuracy: ${accuracy}%`;
                 
-                // Add some dramatic flair
-                predictedFace.style.transform = 'scale(0.5)';
+                // Add some dramatic flair with animation
+                predictedFace.style.transform = 'scale(0.3) rotate(-10deg)';
+                predictedFace.style.opacity = '0';
                 setTimeout(() => {
-                    predictedFace.style.transition = 'transform 0.5s ease';
-                    predictedFace.style.transform = 'scale(1)';
+                    predictedFace.style.transition = 'all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    predictedFace.style.transform = 'scale(1) rotate(0deg)';
+                    predictedFace.style.opacity = '1';
                 }, 100);
+                
+                // Animate the message appearing
+                const messageEl = document.getElementById('predictionMessage');
+                messageEl.style.opacity = '0';
+                messageEl.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    messageEl.style.transition = 'all 0.6s ease';
+                    messageEl.style.opacity = '1';
+                    messageEl.style.transform = 'translateY(0)';
+                }, 500);
+                
+                // Animate the fun fact
+                const factEl = document.getElementById('funFact');
+                factEl.style.opacity = '0';
+                factEl.style.transform = 'translateX(-20px)';
+                setTimeout(() => {
+                    factEl.style.transition = 'all 0.6s ease';
+                    factEl.style.opacity = '1';
+                    factEl.style.transform = 'translateX(0)';
+                }, 800);
+                
             }, 1000);
         }
         

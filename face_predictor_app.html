@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeadFlip AI - Revolutionary Face Prediction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .tagline {
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .upload-area {
+            border: 3px dashed rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            padding: 40px 20px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .upload-area:hover {
+            border-color: #feca57;
+            background: rgba(254, 202, 87, 0.1);
+        }
+        
+        .upload-area.dragover {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            margin: 20px 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: none;
+            margin: 20px 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .tech-jargon {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin: 10px 0;
+            font-style: italic;
+        }
+        
+        .result {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .face-reveal {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 20px auto;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .accuracy {
+            font-size: 1.2em;
+            margin: 15px 0;
+            color: #feca57;
+        }
+        
+        .disclaimer {
+            font-size: 0.8em;
+            opacity: 0.7;
+            margin-top: 20px;
+            font-style: italic;
+        }
+        
+        .uploaded-image {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 10px;
+            margin: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HeadFlip AI</h1>
+        <p class="tagline">Revolutionary Neural Network Face Prediction Technology™</p>
+        
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">🧠</div>
+            <p><strong>Upload a photo of the BACK of someone's head</strong></p>
+            <p>Our AI will predict what their face looks like!</p>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+        
+        <div id="uploadedImageContainer"></div>
+        
+        <button class="btn" id="analyzeBtn" disabled>🔮 Analyze Face</button>
+        
+        <div class="loading" id="loading">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="tech-jargon" id="techText">Initializing quantum face matrices...</div>
+        </div>
+        
+        <div class="result" id="result">
+            <h3>Prediction Complete!</h3>
+            <img class="face-reveal" id="predictedFace" alt="Predicted face">
+            <div class="accuracy" id="accuracyText">Accuracy: 99.7%</div>
+            <p>Based on advanced cranial topology analysis and neural hair pattern recognition.</p>
+            <button class="btn" onclick="resetApp()">Try Another Head</button>
+        </div>
+        
+        <p class="disclaimer">
+            * Results powered by cutting-edge AI trained on millions of head-to-face correlations
+        </p>
+    </div>
+
+    <script>
+        // Animal face URLs (using placeholder images)
+        const animalFaces = [
+            'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9Ijk1IiBmaWxsPSIjOEI0NTEzIiBzdHJva2U9IiM2NTQzMjEiIHN0cm9rZS13aWR0aD0iMyIvPgogIDwhLS0gRG9ua2V5IGZhY2UgLS0+CiAgPCEtLSBFeWVzIC0tPgogIDxjaXJjbGUgY3g9IjcwIiBjeT0iODAiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgogIDxjaXJjbGUgY3g9IjEzMCIgY3k9IjgwIiByPSIxNSIgZmlsbD0id2hpdGUiLz4KICA8Y2lyY2xlIGN4PSI3MCIgY3k9IjgwIiByPSI4IiBmaWxsPSJibGFjayIvPgogIDxjaXJjbGUgY3g9IjEzMCIgY3k9IjgwIiByPSI4IiBmaWxsPSJibGFjayIvPgogIDwhLS0gTm9zZSAtLT4KICA8ZWxsaXBzZSBjeD0iMTAwIiBjeT0iMTEwIiByeD0iMjAiIHJ5PSIzMCIgZmlsbD0iIzY1NDMyMSIvPgogIDxlbGxpcHNlIGN4PSI5NSIgY3k9IjEwNSIgcng9IjQiIHJ5PSI4IiBmaWxsPSJibGFjayIvPgogIDxlbGxpcHNlIGN4PSIxMDUiIGN5PSIxMDUiIHJ4PSI0IiByeT0iOCIgZmlsbD0iYmxhY2siLz4KICA8IS0tIE1vdXRoIC0tPgogIDxwYXRoIGQ9Ik04MCA1MCBRIDEwMCAxNzAgMTIwIDUwIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiLz4KICA8IS0tIEVhcnMgLS0+CiAgPGVsbGlwc2UgY3g9IjUwIiBjeT0iNjAiIHJ4PSIyNSIgcnk9IjQwIiBmaWxsPSIjOEI0NTEzIiBzdHJva2U9IiM2NTQzMjEiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxlbGxpcHNlIGN4PSIxNTAiIGN5PSI2MCIgcng9IjI1IiByeT0iNDAiIGZpbGw9IiM4QjQ1MTMiIHN0cm9rZT0iIzY1NDMyMSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMTAwIiB5PSIxODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iYmxhY2siPkRPTktFWTwvdGV4dD4KPC9zdmc+',
+            
+            'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9Ijk1IiBmaWxsPSIjNzM0QTJFIiBzdHJva2U9IiM0MjI5MTgiIHN0cm9rZS13aWR0aD0iMyIvPgogIDwhLS0gQXBlIGZhY2UgLS0+CiAgPCEtLSBFeWVzIC0tPgogIDxjaXJjbGUgY3g9IjcwIiBjeT0iNzUiIHI9IjE4IiBmaWxsPSJ3aGl0ZSIvPgogIDxjaXJjbGUgY3g9IjEzMCIgY3k9Ijc1IiByPSIxOCIgZmlsbD0id2hpdGUiLz4KICA8Y2lyY2xlIGN4PSI3MCIgY3k9Ijc1IiByPSIxMCIgZmlsbD0iYmxhY2siLz4KICA8Y2lyY2xlIGN4PSIxMzAiIGN5PSI3NSIgcj0iMTAiIGZpbGw9ImJsYWNrIi8+CiAgPCEtLSBOb3NlIC0tPgogIDxlbGxpcHNlIGN4PSIxMDAiIGN5PSIxMTAiIHJ4PSIxNSIgcnk9IjIwIiBmaWxsPSIjNDIyOTE4Ii8+CiAgPGVsbGlwc2UgY3g9Ijk1IiBjeT0iMTA4IiByeD0iMyIgcnk9IjYiIGZpbGw9ImJsYWNrIi8+CiAgPGVsbGlwc2UgY3g9IjEwNSIgY3k9IjEwOCIgcng9IjMiIHJ5PSI2IiBmaWxsPSJibGFjayIvPgogIDwhLS0gTW91dGggLS0+CiAgPGVsbGlwc2UgY3g9IjEwMCIgY3k9IjE0NSIgcng9IjMwIiByeT0iMTUiIGZpbGw9IiMyMjE0MTAiLz4KICA8IS0tIEJyb3cgLS0+CiAgPHBhdGggZD0iTTUwIDUwIFEgNzAgNDAgOTAgNTAiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPgogIDxwYXRoIGQ9Ik0xMTAgNTAgUSAxMzAgNDAgMTUwIDUwIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjQiIGZpbGw9Im5vbmUiLz4KICA8dGV4dCB4PSIxMDAiIHk9IjE4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSJibGFjayI+QVBFPC90ZXh0Pgo8L3N2Zz4=',
+            
+            'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9Ijk1IiBmaWxsPSIjQzY4QzUzIiBzdHJva2U9IiM4RjYxM0MiIHN0cm9rZS13aWR0aD0iMyIvPgogIDwhLS0gTW9ua2V5IGZhY2UgLS0+CiAgPCEtLSBFeWVzIC0tPgogIDxjaXJjbGUgY3g9IjcwIiBjeT0iODAiIHI9IjE2IiBmaWxsPSJ3aGl0ZSIvPgogIDxjaXJjbGUgY3g9IjEzMCIgY3k9IjgwIiByPSIxNiIgZmlsbD0id2hpdGUiLz4KICA8Y2lyY2xlIGN4PSI3MCIgY3k9IjgwIiByPSI5IiBmaWxsPSJibGFjayIvPgogIDxjaXJjbGUgY3g9IjEzMCIgY3k9IjgwIiByPSI5IiBmaWxsPSJibGFjayIvPgogIDwhLS0gTm9zZSAtLT4KICA8ZWxsaXBzZSBjeD0iMTAwIiBjeT0iMTA1IiByeD0iOCIgcnk9IjEyIiBmaWxsPSIjOEY2MTNDIi8+CiAgPGVsbGlwc2UgY3g9Ijk3IiBjeT0iMTAyIiByeD0iMiIgcnk9IjQiIGZpbGw9ImJsYWNrIi8+CiAgPGVsbGlwc2UgY3g9IjEwMyIgY3k9IjEwMiIgcng9IjIiIHJ5PSI0IiBmaWxsPSJibGFjayIvPgogIDwhLS0gTW91dGggLS0+CiAgPGVsbGlwc2UgY3g9IjEwMCIgY3k9IjEzNSIgcng9IjI1IiByeT0iMTIiIGZpbGw9IiM2QjQyMjYiLz4KICA8IS0tIEVhcnMgLS0+CiAgPGNpcmNsZSBjeD0iNDAiIGN5PSI3MCIgcj0iMjAiIGZpbGw9IiNDNjhDNTMiIHN0cm9rZT0iIzhGNjEzQyIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPGNpcmNsZSBjeD0iMTYwIiBjeT0iNzAiIHI9IjIwIiBmaWxsPSIjQzY4QzUzIiBzdHJva2U9IiM4RjYxM0MiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjEwMCIgeT0iMTgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9ImJsYWNrIj5NT05LRVk8L3RleHQ+Cjwvc3ZnPg=='
+        ];
+        
+        const techPhrases = [
+            "Initializing quantum face matrices...",
+            "Analyzing cranial topology patterns...",
+            "Processing neural hair correlations...",
+            "Calculating facial probability vectors...",
+            "Engaging deep learning algorithms...",
+            "Mapping skull-to-face neural pathways...",
+            "Optimizing prediction confidence levels...",
+            "Finalizing biometric face synthesis..."
+        ];
+        
+        let uploadedFile = null;
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        const progressFill = document.getElementById('progressFill');
+        const techText = document.getElementById('techText');
+        const predictedFace = document.getElementById('predictedFace');
+        const accuracyText = document.getElementById('accuracyText');
+        const uploadedImageContainer = document.getElementById('uploadedImageContainer');
+        
+        // Upload area click
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+        
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please upload an image file!');
+                return;
+            }
+            
+            uploadedFile = file;
+            analyzeBtn.disabled = false;
+            
+            // Show uploaded image
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                uploadedImageContainer.innerHTML = `
+                    <p>✅ Back of head uploaded successfully!</p>
+                    <img src="${e.target.result}" class="uploaded-image" alt="Uploaded image">
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function analyzeface() {
+            if (!uploadedFile) return;
+            
+            // Hide upload area and show loading
+            uploadArea.style.display = 'none';
+            analyzeBtn.style.display = 'none';
+            loading.style.display = 'block';
+            
+            let progress = 0;
+            let phraseIndex = 0;
+            
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) progress = 100;
+                
+                progressFill.style.width = progress + '%';
+                
+                // Change tech phrase
+                if (Math.random() > 0.6) {
+                    phraseIndex = (phraseIndex + 1) % techPhrases.length;
+                    techText.textContent = techPhrases[phraseIndex];
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    showResult();
+                }
+            }, 200);
+        }
+        
+        function showResult() {
+            setTimeout(() => {
+                loading.style.display = 'none';
+                result.style.display = 'block';
+                
+                // Pick random animal face
+                const randomFace = animalFaces[Math.floor(Math.random() * animalFaces.length)];
+                predictedFace.src = randomFace;
+                
+                // Random "accuracy"
+                const accuracy = (95 + Math.random() * 4.9).toFixed(1);
+                accuracyText.textContent = `Accuracy: ${accuracy}%`;
+                
+                // Add some dramatic flair
+                predictedFace.style.transform = 'scale(0.5)';
+                setTimeout(() => {
+                    predictedFace.style.transition = 'transform 0.5s ease';
+                    predictedFace.style.transform = 'scale(1)';
+                }, 100);
+            }, 1000);
+        }
+        
+        function resetApp() {
+            uploadArea.style.display = 'block';
+            analyzeBtn.style.display = 'inline-block';
+            analyzeBtn.disabled = true;
+            loading.style.display = 'none';
+            result.style.display = 'none';
+            uploadedImageContainer.innerHTML = '';
+            progressFill.style.width = '0%';
+            techText.textContent = 'Initializing quantum face matrices...';
+            uploadedFile = null;
+            fileInput.value = '';
+        }
+        
+        // Add analyze function to button
+        analyzeBtn.addEventListener('click', analyzeface);
+    </script>
+</body>
+</html>
